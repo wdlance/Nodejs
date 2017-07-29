@@ -1,0 +1,1191 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>人脸标注</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style type="text/css">
+    .wrapper {
+        width: 1200px;
+        height: 600px;
+        margin: auto;
+    }
+    
+    .wrapper .left,
+    .wrapper .right {
+        float: left;
+    }
+    
+    .wrapper ul {
+        padding: 0px;
+        margin: 0px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+    
+    .wrapper ul li {
+        list-style: none;
+        float: left;
+        height: 40px;
+        line-height: 40px;
+        border: 1px solid #dcdcdc;
+        border-bottom: none;
+        padding: 0px 15px;
+    }
+    
+    .wrapper ul li.active {
+        border: 1px solid red;
+        color: red;
+    }
+    
+    .step {
+        text-align: center;
+    }
+    
+   .wrapper .operate {
+        margin-bottom: 30px;
+        position: relative;
+    }
+     input[type='file'] {
+        left: 0px;
+        position: absolute;
+        width: 95px;
+        opacity: 0;
+    }
+    .wrapper .img_area {
+        width: 800px;
+        border: 1px solid #dcdcdc;
+        height: 500px;
+        float: left;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .wrapper .img_area img,
+    .wrapper .img_area canvas,
+    .wrapper .img_area .cover {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        z-index: 10;
+    }
+    
+    .wrapper .img_area .cover {
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        z-index: 20
+    }
+      .wrapper .img_area img {
+        z-index: 30;
+    }
+    .wrapper .img_area .rect,
+    .wrapper .img_area .close,
+    .wrapper .img_area .border {
+        position: absolute;
+        z-index: 100;
+    }
+    
+    .wrapper .img_area .border {
+        border: 5px solid rgba(255, 0, 0, 0.5);
+        z-index: 50;
+    }
+    
+    .wrapper .img_area .choosed {
+        border: 5px solid red;
+    }
+    
+    .wrapper .img_area .masking {
+        background: rgba( 89, 89, 89, 0.97);
+    }
+    
+    .wrapper .img_area .close {
+        width: 20px;
+        height: 20px;
+        background: rgba(0, 0, 0, 0.2);
+        color: #fff;
+        text-align: center;
+        line-height: 20px;
+    }
+    
+    .wrapper .img_area .point {
+        position: absolute;
+        background: red;
+        width: 10px;
+        height: 10px;
+        border-radius: 100%;
+        z-index: 150;
+    }
+    
+    .wrapper .choose_area {
+        border: 1px solid #dcdcdc;
+        padding: 15px;
+        margin-top: 102px;
+        height: 478px;
+    }
+    
+    .wrapper .choose_area .item {
+        text-align: center;
+        height: 25%;
+    }
+    
+    .wrapper .choose_area .item:last-child {
+        border-right: none;
+    }
+    
+    .wrapper .choose_area .item .title {
+        margin-bottom: 15px;
+    }
+    
+    .undoList {
+        width: 300px;
+        height: 400px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        background: #fff;
+        margin-top: -200px;
+        margin-left: -150px;
+        border: 1px solid #dcdcdc;
+        box-shadow: 0px 0px 5px #ccc;
+        border-radius: 10px;
+        padding: 15px;
+        display: none;
+        z-index: 200;
+    }
+    
+    .undoList .title,
+    .undoList .footer {
+        text-align: center;
+        height: 40px;
+        line-height: 40px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+    
+    .undoList .footer {
+        border: none;
+        border-top: 1px solid #dcdcdc;
+    }
+    
+    .undoList .footer button {
+        width: 100%;
+        height: 100%;
+        display: block;
+        cursor: pointer;
+        background: none;
+        border: none;
+    }
+    
+    .undoList .content {
+        overflow-y: auto;
+        height: 300px;
+        padding: 15px 0px;
+    }
+    
+    .undoList .content .tip {
+        text-align: center;
+        margin-top: 15px;
+    }
+    
+    .undoList .content .item {
+        line-height: 30px;
+    }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <ul>
+            <li class="face">人脸检测</li>
+            <li class="body active">人行检测</li>
+            <div style="clear:both;"></div>
+        </ul>
+        <div class="left">
+            <div class="operate">
+                <button class="choose_load">选择加载图片</button>
+                 <input type="file" />
+                <button class="mask">蒙版</button>
+                <button class="insulate">隔离</button>
+                <button class="save">保存</button>
+                <button class="del_rect">删除人脸框</button>
+                <button class="compare">比对</button>
+            </div>
+            <h3 class="step">
+        步骤一：选择图片
+        </h3>
+            <div style="font-size: 12px;">通过方向键可移动图片位置，滚动鼠标可放大/缩小图片，鼠标移入人脸框可查看人脸标签</div>
+            <div class="img_area">
+                <img class="img" src="" onload="loadImage(this)">
+                 <canvas id="canvas" width="800px" height="500px"></canvas>
+            <div class="cover"></div>
+            </div>
+        </div>
+        <div class="right">
+            <fieldset class="choose_area">
+                <legend>选择人脸标签</legend>
+                <div class="item">
+                    <div class="title">人形姿态</div>
+                    <input type="radio" name="posture" value="0" />站立
+                    <input type="radio" name="posture" value="1" />坐立
+                    <input type="radio" name="posture" value="2" />躺
+                </div>
+                <div class="item">
+                    <div class="title">人形遮挡情况</div>
+                    <input type="radio" name="shadow" value="0" />全身
+                    <input type="radio" name="shadow" value="1" />上半身
+                    <input type="radio" name="shadow" value="2" />下半身
+                    <input type="radio" name="shadow" value="3" />左右半身
+                </div>
+                <div class="item">
+                    <div class="title">人形清晰度</div>
+                    <input type="radio" name="definition" value="0" />清晰
+                    <input type="radio" name="definition" value="1" />模糊
+                </div>
+            </fieldset>
+        </div>
+        <div class="undoList">
+            <div class="title">对比结果</div>
+            <div class="content"></div>
+            <div class="footer">
+                <button onclick="closeUndoList()">好的</button>
+            </div>
+        </div>
+        <script src="/lib/jquery-1.11.3.min.js"></script>
+        <script src="/lib/jquery.mousewheel.min.js"></script>
+</body>
+<script type="text/javascript">
+//人形、人脸标注工具切换
+$('.wrapper li').on('click', function() {
+        $('.wrapper li').removeClass('active');
+        $(this).addClass('active');
+        if ($('.face').hasClass('active')) {
+            location.href = 'http://localhost:3000'
+        } else {
+            location.href = 'http://localhost:3000/body'
+        }
+})
+//获取全部图片
+var allImages = []; 
+function getAllImage() {
+    clear();
+    $.ajax({
+        url: 'http://localhost:3000?act=getAll',
+        method: 'post',
+        data: {},
+        async: false,
+        success: function(jsonObj) {
+            if (jsonObj.ret == 0) {
+                for (var i = 0; i < jsonObj.data.length; i++) {
+                    var data = jsonObj.data[i].replace("\\", "/");
+                    var img = jsonObj.data[i];
+                    allImages.push(img)
+                }
+            } else {
+                alert(jsonObj.msg)
+            }
+        }
+    })
+}
+getAllImage();
+var img_num = 0; //计算当前显示图片的次序
+var persons = [] //获取所有被处理过的图片
+var insulates = []; //获取被隔离的所有文件
+var scroll_num = 0; //鼠标滚动放大缩小图片
+var hasDrag = false; //表示人脸框发生了click时间还是拖动事件
+var hasMove = false;
+var r_num = 0; //记录人脸框个数
+var rects = [];
+var x0 = 0,
+    y0 = 0,
+    w = 0,
+    h = 0;
+//标注关键点
+var p_num = 0; //用于记录关键点数
+var points = [];
+var labels = [];
+var images=[];//用户选择图片后面的所有图片数组
+$('input[type="file"]').on('change', function(e) {
+	var filename = e.target.files[0].name;
+    img_num = getIndex(filename);//每次重新加载图片时，都是返回图片数组中的第一张图片
+    for (var i = 0; i < allImages.length; i++) {
+        if (allImages[i].split('/')[allImages[i].split('/').length - 1] == filename) {
+            $('.img_area img').attr('src', allImages[i]);
+            //获取该图片的相关信息
+            get_face_info($('.img_area img').attr('src'));
+            //从后台取得该图片后面的图片数组
+            $.ajax({
+                url: 'http://localhost:3000?act=displayImage',
+                method: 'post',
+                data: {
+                    src: allImages[i]
+                },
+                async: false,
+                success: function(jsonObj) {
+                    if (jsonObj.ret == 0) {
+                        if (jsonObj.data) {
+                            images = jsonObj.data;
+                            $('input[type="file"]').val("")
+                        }
+                    } else if (jsonObj.ret < 0) {
+                        alert(jsonObj.msg)
+                    }
+                }
+            })
+            break;
+        }
+    }
+})
+function getInsulate() {
+    insulates = [];
+    $.ajax({
+        url: 'http://localhost:3000/body?act=getInsulate',
+        method: 'post',
+        data: {},
+        async: false,
+        success: function(jsonObj) {
+            if (jsonObj.ret == 0) {
+                if (jsonObj.data) {
+                    insulates = jsonObj.data.split('\n')
+                }
+            } else if (jsonObj.ret < 0) {
+                alert(jsonObj.msg)
+            }
+        }
+    })
+}
+//获取所有被处理过的图片
+var persons = []
+function getPersons() {
+    persons = [];
+    $.ajax({
+        url: 'http://localhost:3000/body?act=getPersons',
+        method: 'post',
+        data: {},
+        async: false,
+        success: function(jsonObj) {
+            if (jsonObj.ret == 0) {
+                if (jsonObj.data) {
+                    var data = JSON.parse(jsonObj.data);
+                    for (var i = 0; i < data.length; i++) {
+                        persons.push(data[i].src);
+                    }
+                }
+
+            } else if (jsonObj.ret < 0) {
+                alert(jsonObj.msg)
+            }
+        }
+    })
+}
+//通过方向键移动图片
+document.onkeydown = function(event) {
+        if (event.keyCode == 37) {
+            var left = $('.img_area').find('img').position().left;
+            left = left - 50;
+            $('.img_area').find('img').css('left', left + 'px');
+            $('.img_area').find('canvas').css('left', left + 'px');
+            move_rect('left')
+        } else if (event.keyCode == 39) {
+            var left = $('.img_area').find('img').position().left;
+            left = 50 + left;
+            $('.img_area').find('img').css('left', left + 'px');
+             $('.img_area').find('canvas').css('left', left + 'px');
+            move_rect('right')
+        } else if (event.keyCode == 38) {
+            var top = $('.img_area').find('img').position().top;
+            top = top - 50;
+            $('.img_area').find('img').css('top', top + 'px')
+            $('.img_area').find('canvas').css('top', top + 'px')
+            move_rect('up')
+        } else if (event.keyCode == 40) {
+            var top = $('.img_area').find('img').position().top;
+            top = top + 50;
+            $('.img_area').find('img').css('top', top + 'px')
+            $('.img_area').find('canvas').css('top', top + 'px')
+            move_rect('down')
+        }
+}
+//随着图片的上下左右移动，标注的人脸框和关键点也要移动
+function move_rect(direction) {
+    if ($('.img_area').find('.border').length > 0) {
+        for (var i = 0; i < $('.img_area').find('.border').length; i++) {
+            var b_left = $('.img_area').find('.border').eq(i).position().left;
+            var b_top = $('.img_area').find('.border').eq(i).position().top;
+            switch (direction) {
+                case 'left':
+                    b_left = b_left - 50;
+                    $('.img_area').find('.border').eq(i).css('left', b_left + 'px');
+                    break;
+                case 'right':
+                    b_left = b_left + 50;
+
+                    $('.img_area').find('.border').eq(i).css('left', b_left + 'px');
+                    break;
+                case 'up':
+                    b_top = b_top - 50;
+
+                    $('.img_area').find('.border').eq(i).css('top', b_top + 'px');
+                    break;
+                case 'down':
+                    b_top = b_top + 50;
+                    $('.img_area').find('.border').eq(i).css('top', b_top + 'px');
+                    break;
+            }
+
+        }
+    }
+}
+//获取存储的人脸信息
+function get_face_info() {
+    clear()
+    var src = $('.img_area img').attr('src');
+    $.ajax({
+        url: 'http://localhost:3000/body?act=get_face_info',
+        method: 'post',
+        data: {
+            src: src
+        },
+        success: function(jsonObj) {
+            if (jsonObj.ret == 0) {
+                var faceInfo = JSON.parse(jsonObj.data).faceInfo;
+                var maskInfo = JSON.parse(jsonObj.data).maskInfo;
+                if (faceInfo) {
+                    if (faceInfo.rects) {
+                        rects = JSON.parse(faceInfo.rects);
+                    }
+                    drawRect(rects);
+                }
+                if (maskInfo) {
+                    drawMasks(maskInfo.masks);
+                }
+            } else if (jsonObj.ret != -1 && jsonObj.ret != 0) {
+                alert(jsonObj.msg)
+            }
+        }
+    })
+}
+//绘制人脸框
+function drawRect(rectInfos) {
+    for (var i = 0; i < rectInfos.length; i++) {
+        var rectInfo = rectInfos[i];
+        var rect = $('<div class="rect"></div>');
+        var border = $('<div class="border"></div>');
+        $('.img_area').append(border);
+        var b_class = "border" + i;
+        $('.img_area').find('.border').eq(i).addClass(b_class);
+        $('.img_area').find('.border').eq(i).append(rect);
+        var r_class = "rect" + i;
+        $('.img_area').find('.rect').eq(i).addClass(r_class);
+        $('.img_area').find('.rect').eq(i).css({
+            width: rectInfo.width,
+            height: rectInfo.height
+        })
+        $('.img_area').find('.border').eq(i).css({
+            left: rectInfo.left,
+            top: rectInfo.top,
+            width: rectInfo.width,
+            height: rectInfo.height
+        })
+        r_num++;
+    }
+}
+//绘制蒙版
+function drawMasks(masks) {
+    if (masks.length > 0) {
+        for (var i = 0; i < masks.length; i++) {
+            var mask = masks[i];
+            var border = $('<div class="border masking"></div>');
+            var rect = $('<div class="rect"></div>');
+            $('.img_area').append(border);
+            var num = r_num + i
+            var className = "border" + num;
+            $('.img_area').find('.border').eq(num).addClass(className)
+            var m_x = mask.left;
+            var m_y = mask.top;
+            var m_w = mask.width;
+            var m_h = mask.height;
+            $('.img_area').find('.border').eq(num).css({
+                left: m_x,
+                top: m_y,
+                width: m_w,
+                height: m_h
+            })
+        }
+        r_num++;
+    }
+}
+//设置人形标签选择项
+function setChoose(rectInfo) {
+    var posture = rectInfo.posture;
+    var shadow = rectInfo.shadow;
+    var definition = rectInfo.definition;
+    $("input[name='posture'][value='" + posture + "']").prop("checked", "checked");
+    $("input[name='shadow'][value='" + shadow + "']").prop("checked", "checked");
+    $("input[name='definition'][value='" + definition + "']").prop("checked", "checked");
+}
+
+function loadImage() {
+    //保存图片原始大小
+    storeInitialSize()
+}
+//获取图片大小
+function getImageSize() {
+    return {
+        width: $('.img_area img').width(),
+        height: $('.img_area img').height(),
+    }
+}
+//存储图片初始大小
+function storeInitialSize() {
+    var width = getImageSize().width;
+    var height = getImageSize().height;
+    $('.img_area img').data('width', width);
+    $('.img_area img').data('height', height);
+}
+//鼠标滚动放大缩小图片
+var scroll_num = 0;
+$('.img_area').hover(function(e) {}, function() {}).mousewheel(function(event, delta, deltaX, deltaY) {
+    if ($('.img_area').find('img').attr('src') == "") {
+        return;
+    }
+    var img = $('.img_area').find('img')
+    scroll_num++;
+    var height = img.height(); //获取图片宽度 
+    var width = img.width(); // 获取图片高度 
+    var stepex = height / width; //获取退片宽高比
+    var minHeight =100; //获取图片初始高度
+    var tempStep = 50; // 每次滚动增减幅度
+    var left = img.position().left;
+    var top = img.position().top;
+    // img.removeAttr('style');
+    if (delta == 1) { //鼠标向上滚动
+        // img.attr("height", height + scroll_num * tempStep);
+        //img.attr("width", width + scroll_num * tempStep / stepex);
+        img.width(width + scroll_num * tempStep / stepex)
+        img.height(height + scroll_num * tempStep)
+        change_location(width, img.width(), height, img.height())
+    } else if (delta == -1) { //鼠标向下滚动
+        if (height > minHeight) {
+
+            img.width(width - scroll_num * tempStep / stepex)
+            img.height(height - scroll_num * tempStep)
+            change_location(width, img.width(), height, img.height())
+        } else {
+
+            img.width(minHeight / stepex)
+            img.height(minHeight)
+        }
+    }
+    event.preventDefault();
+    scroll_num = 0;
+});
+var hasMove = false; //表示发生了图片click事件还是拖动事件;
+var hasDrag = false; //表示人脸框发生了click时间还是拖动事件
+var e_which = 0; //用于判断是否按下鼠标左键
+var r_num = 0; //记录人行框个数
+var rects = [];
+var x0 = 0,
+    y0 = 0,
+    w = 0,
+    h = 0;
+$('.img_area').on('mousedown', 'img,.border', function(e) {
+    e.stopPropagation();
+    if ($('.img_area').find('img').attr('src') == "") {
+        return;
+    }
+    if ($(e.target).hasClass('border')) {
+        hasDrag = true;
+    }
+    e.preventDefault(); //禁止浏览器默认的图片拖动效果
+    var width0 = $(this).data('width'); //获取图片原始宽度
+    var height0 = $(this).data('height'); //获取图片原始高度
+    var width = $(this).width(); //获取图片当前宽度
+    var height = $(this).height(); //获取图片当前高度
+    //获取鼠标点击位置
+    var x = e.clientX;
+    var y = e.clientY;
+    //获取图片相对位置
+    var left = $('.img_area img').offset().left;
+    var top = $('.img_area img').offset().top;
+    //计算得到点击点相对图片位置
+    x0 = x - left;
+    y0 = y - top;
+    hasMove = false;
+})
+$('.img_area').on('mouseup', 'img,.border,.rect', function(e) {
+    e.stopPropagation()
+    if ($('.img_area').find('img').attr('src') == "") {
+        return;
+    }
+    //获得滚动条滚动长度、宽度
+    var scrollX = getScrollLength().scrollX
+    var scrollY = getScrollLength().scrollY;
+    if (hasMove) {
+        if (hasDrag == false) {
+            //获取鼠标点击位置
+            var x = e.clientX;
+            var y = e.clientY;
+            //获取图片相对位置
+            var left = $('.img_area img').offset().left;
+            var top = $('.img_area img').offset().top;
+            //计算得到点击点相对图片位置
+            var x1 = x - left;
+            var y1 = y - top;
+            //计算拖动宽度、高度
+            w = x1 - x0;
+            h = y1 - y0;
+            if (w > 0 && h > 0) {
+                var rect = $('<div class="rect"></div>');
+                var border = $('<div class="border"></div>');
+                $('.img_area').append(border);
+                var b_class = "border" + r_num;
+                $('.img_area').find('.border').eq(r_num).addClass(b_class);
+                $('.img_area').find('.border').eq(r_num).append(rect);
+                var r_class = "rect" + r_num;
+                $('.img_area').find('.rect').eq(r_num).addClass(r_class);
+                $('.img_area').find('.rect').eq(r_num).css({
+                    width: w,
+                    height: h
+                })
+                $('.img_area').find('.border').eq(r_num).css({
+                    left: x0 + scrollX + $(this).position().left,
+                    top: y0 + scrollY + $(this).position().top,
+                    width: w,
+                    height: h
+                })
+                isChooseRect = false;
+                var px = getRatio().px;
+                var py = getRatio().py;
+                rects.push({
+                    left: x0,
+                    top: y0,
+                    width: w,
+                    height: h,
+                    px: px,
+                    py: py,
+                    rect: $('.img_area').find('.rect').eq(r_num).attr('class')
+                })
+                r_num++;
+                //切换步骤
+                $('.step').html("步骤三：选择人形标签")
+            }
+        } else {
+            var border = $('.img_area').find('.border');
+            for (var i = 0; i < border.length; i++) {
+                if ($(border[i]).css('cursor') == 'nwse-resize') {
+                    //获取鼠标释放位置
+                    var x1 = e.clientX;
+                    var y1 = e.clientY;
+                    //获取图片相对位置
+                    var left = $('.img_area img').offset().left;
+                    var top = $('.img_area img').offset().top;
+                    //计算得到点击点相对图片位置
+                    var x2 = x1 - left;
+                    var y2 = y1 - top;
+                    //计算拖动宽度、高度
+                    w = x2 - x0;
+                    h = y2 - y0;
+                    var choose_rect = $(border[i]);
+                    if (choose_rect.length > 0) {
+                        choose_rect.css({
+                            left: choose_rect.position().left,
+                            top: choose_rect.position().top,
+                            width: w + choose_rect.innerWidth(),
+                            height: h + choose_rect.innerHeight()
+                        })
+                        choose_rect.find('.rect').css({
+                            width: choose_rect.innerWidth(),
+                            height: choose_rect.innerHeight()
+                        })
+                        var r_class = choose_rect.find('.rect').attr('class');
+                        for (var i = 0; i < rects.length; i++) {
+                            if (rects[i].rect == r_class) {
+                                var px = $('.img_area img').width() / $('.img_area img').data('width');
+                                var py = $('.img_area img').height() / $('.img_area img').data('height');
+                                rects[i].width = choose_rect.innerWidth() / px;
+                                rects[i].height = choose_rect.innerHeight() / py
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        hasMove = false;
+        hasDrag = false;
+    }
+})
+$('.img_area').on('mousemove', 'img,.border', function(e) {
+    hasMove = true;
+})
+$('.img_area').on('mouseup', '.rect', function(e) {
+    e.stopPropagation()
+})
+    //点击边框选中人脸框
+$('.img_area').on('click', '.border', function() {
+        $(this).siblings().removeClass('choosed');
+        $(this).toggleClass('choosed');
+        if ($(this).hasClass("choosed")) {
+            var r_class = $(this).attr('class');
+            var choose_rect_info = find_choose_rect_info(r_class);
+            if (choose_rect_info) {
+                setChoose(choose_rect_info);
+            }
+        } else {
+            $("input[name='posture']").attr("checked", false);
+            $("input[name='shadow']").attr("checked", false);
+            $("input[name='definition']").attr("checked", false);
+        }
+
+    })
+     //鼠标移入人脸框查看人脸标签
+$('.img_area').on('mouseover', '.border', function(e) {
+        //通过改变鼠标形态提示用户可以改变人脸框大小
+        $(this).siblings().css('cursor', 'default')
+        $(this).css('cursor', 'nwse-resize')
+    })
+    //鼠标移入人脸框查看人脸标签
+$('.img_area').on('mouseover', '.rect', function(e) {
+        e.stopPropagation()
+        $(this).css('cursor', 'default');
+        var r_class = $(this).attr('class');
+        for (var i = 0; i < rects.length; i++) {
+            if (rects[i].rect == r_class) {
+                setLabels(rects[i])
+            }
+        }
+    })
+    //鼠标移入人脸框查看人脸标签
+$('.img_area').on('mouseout', '.rect', function(e) {
+    e.stopPropagation()
+    $("input[name='posture']").attr("checked", false);
+    $("input[name='shadow']").attr("checked", false);
+    $("input[name='definition']").attr("checked", false);
+})
+
+function setLabels(rects) {
+    var posture = rects.posture;
+    var shadow = rects.shadow;
+    var definition = rects.definition;
+    $(":radio[name='posture'][value='" + posture + "']").prop("checked", "checked");
+    $(":radio[name='shadow'][value='" + shadow + "']").prop("checked", "checked");
+    $(":radio[name='definition'][value='" + definition + "']").prop("checked", "checked");
+}
+//删除人脸框
+$('.del_rect').on('click', function() {
+        var choose_rect = $('.img_area').find('.choosed')
+        if (choose_rect.length > 0) {
+            var newRects = [];
+            var newPoints = [];
+            var r_class = $(choose_rect[0]).find('.rect').attr("class");
+
+            del_from_rects(r_class)
+            choose_rect.remove(); //删除人脸框
+            isChooseRect = false;
+            hasDrag = false;
+            r_num--;
+        } else {
+            alert("未选中人脸框")
+        }
+    })
+    //获取图片放大缩小比率
+function getRatio() {
+    var width0 = $('.img_area img').data('width');
+    var height0 = $('.img_area img').data('height');
+    var width1 = $('.img_area img').width();
+    var height1 = $('.img_area img').height();
+    var px = width1 / width0;
+    var py = height1 / height0;
+    return {
+        px: px,
+        py: py
+    }
+}
+
+function getScrollLength() {
+    return {
+        scrollX: window.scrollX,
+        scrollY: window.scrollY
+    }
+}
+//随着图片放大缩小，标注位置也相应改变
+function change_location(width0, width1, height0, height1) {
+    var img = $('.img_area').find('img')
+    var border = $('.img_area').find('.border');
+    if (border.length > 0) {
+        for (var i = 0; i < border.length; i++) {
+            var border_left = border.eq(i).position().left - img.position().left;
+            var border_top = border.eq(i).position().top - img.position().top;
+            var width = border.eq(i).width();
+            var height = border.eq(i).height();
+            var w_value = width / width0;
+            var h_value = height / height0;
+            var l_value = border_left / width0;
+            var t_value = border_top / height0;
+            border.eq(i).css({
+                left: width1 * l_value + img.position().left,
+                top: height1 * t_value + img.position().top,
+                width: width1 * w_value,
+                height: height1 * h_value
+            })
+            border.eq(i).find('.rect').css({
+                width: width1 * w_value,
+                height: height1 * h_value
+            })
+        }
+    }
+}
+//隔离图片
+$('.insulate').on('click', function() {
+        var src = $('.img_area img').attr('src');
+        if (src) {
+            $.ajax({
+                url: 'http://localhost:3000/body?act=insulate',
+                method: 'post',
+                data: {
+                    src: src
+                },
+                success: function(jsonObj) {
+                    if (jsonObj.ret == 0) {
+                        //nextImg();
+                           saveMask()
+                    } else {
+                        alert(jsonObj.msg)
+                    }
+                }
+            })
+        }
+    })
+    //给图片加蒙版
+$('.mask').on('click', function() {
+        var ctx = document.getElementById('canvas').getContext('2d');
+        var img = new Image();
+        img.onload = function(obj) {
+            ctx.drawImage(img, 0, 0)
+            var choose_rect = $('.img_area').find('.choosed')
+            if (choose_rect.length > 0) {
+                var r_left = choose_rect.position().left;
+                var r_top = choose_rect.position().top;
+                var r_w = choose_rect.width();
+                var r_h = choose_rect.height();
+                choose_rect.addClass('masking')
+                var newArr = [];
+                for (var i = 0; i < rects.length; i++) {
+                    if (choose_rect.find('.rect').attr('class') != rects[i].rect) {
+                         newArr.push(rects[i])
+                    }
+                }
+                rects = newArr;
+                choose_rect.removeClass('choosed')
+                choose_rect.find('.rect').remove()
+            } else {
+                alert("未选中人脸框！");
+            }
+        }
+        img.src = $('.img_area img').attr('src');
+
+    })
+    //自动显示下一张图片
+function nextImg() {
+      if (img_num <=  allImages.length) {
+        img_num++;
+        var img = allImages[img_num];
+        var src = img;
+        if (img_num == allImages.length) {
+            src = ""
+        }
+        $('.img_area img').attr('src', src);
+        get_face_info(src);
+        //保存图片原始大小
+        storeInitialSize()
+    } else {
+        alert("已是最后一张图片")
+    }
+}
+//确认人形标签选择
+$('.confirm').on('click', function() {
+    var posture = $("input[name='posture']:checked").val();
+    var shadow = $("input[name='shadow']:checked").val();
+    var definition = $("input[name='definition']:checked").val();
+    var choose_rect = $('.img_area').find('.choosed');
+    if (choose_rect.length > 0) {
+        var r_class = choose_rect.find('.rect').attr('class');
+        var choose_rect_info = find_choose_rect_info(r_class);
+        choose_rect_info.label = {
+            posture: posture,
+            shadow: shadow,
+            definition: definition
+        }
+        $('.step').html('步骤二：标注人形框')
+    } else {
+        alert("请先选中人形框")
+    }
+})
+$('input[type="radio"]').on('click', function() {
+        var choose_rect = $('.img_area').find('.choosed')
+        if (choose_rect.length < 1) {
+            alert("请先选中人脸框");
+        } else {
+            var val = $(this).val();
+            var name = $(this).attr('name');
+            var r_class = choose_rect.find('.rect').attr('class');
+            var choose_rect_info = find_choose_rect_info(r_class);
+            switch (name) {
+                case 'posture':
+                    choose_rect_info.posture = val;
+                    break;
+                case 'shadow':
+                    choose_rect_info.shadow = val;
+                    break;
+                case 'definition':
+                    choose_rect_info.definition = val;
+                    break;
+            }
+        }
+    })
+    //通过选中人形框的class值获取rects集合中的选中人形框的信息
+function find_choose_rect_info(r_class) {
+    for (var i = 0; i < rects.length; i++) {
+        var rect = rects[i]
+        if (r_class == rect.rect) {
+            return rect;
+        }
+    }
+}
+
+    //比对
+$('.compare').on('click', function(e) {
+    e.stopPropagation();
+    getInsulate();
+    getPersons();
+    for (var i = 0; i < insulates.length; i++) {
+        persons.push(insulates[i]);
+    }
+    var str = "";
+    for (var i = 0; i < allImages.length; i++) {
+        var image = allImages[i];
+        if ($.inArray(image, persons) != -1) { //存在
+
+        } else {
+            str += '<div class="item">' + image + '</div>'
+        }
+    }
+    if (allImages.length != 0) {
+        if (str == "") {
+            str = "<div class='tip'>全部图片已经处理完毕</div>"
+        }
+    } else {
+        str = "<div class='tip'>请先加载图片</div>"
+    }
+    $('.undoList').find('.content').html(str)
+    $('.undoList').css('display', 'block')
+})
+
+function closeUndoList() {
+    $('.undoList').find('.content').html("")
+    $('.undoList').css('display', 'none')
+}
+$('body').on('click', function() {
+        $('.undoList').find('.content').html("")
+        $('.undoList').css('display', 'none')
+    })
+    //点击未处理图片进行处理
+$('.undoList').on('click', '.item', function() {
+        clear();
+        var str = $(this).text();
+        $('.img_area img').attr('src', str)
+        img_num = getIndex(str)
+        $('.undoList').find('.content').html("")
+        $('.undoList').css('display', 'none')
+    })
+    //找出相应图片的次序
+function getIndex(src) {
+    //return n = $.inArray(src, allImages);
+    for(var i=0;i<allImages.length;i++){
+    	if(allImages[i].indexOf(src)!=-1){
+    		return i;
+    	}
+    }
+}
+//保存操作信息并自动加载下一张图片
+$('.save').on('click', function() {
+    if ($('.img_area img').attr('src') == '') {
+        return;
+    }
+    saveMask()
+})
+function draw_canvas_mask(l, t, w, h) {
+    var ctx = document.getElementById('canvas').getContext('2d');
+    ctx.beginPath();
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = "5"
+    ctx.fillStyle = "rgba(89,89,89,0.97)"
+    ctx.rect(l, t, w, h)
+    ctx.fill()
+    ctx.stroke();
+}
+//存储蒙版处理过的图片信息
+function saveMask() {
+    var masks = []
+    var src = $('.img_area').find('img').attr('src');
+    var filename = src.split("/")[src.split("/").length - 1]
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    var img = new Image();
+    img.onload = function() {
+        ctx.drawImage(img, 0, 0)
+        for (var i = 0; i < $('.img_area').find('.masking').length; i++) {
+            var m_l = $('.img_area').find('.masking').eq(i).position().left;
+            var m_t = $('.img_area').find('.masking').eq(i).position().top;
+            var m_w = $('.img_area').find('.masking').eq(i).width();
+            var m_h = $('.img_area').find('.masking').eq(i).height();
+            var img_left = $('.img_area').find('img').position().left;
+            var img_top = $('.img_area').find('img').position().top;
+            var img_width = $('.img_area').find('img').width();
+            var img_height = $('.img_area').find('img').height();
+            var w_value = img_width / $('.img_area').find('img').data('width')
+            var h_value = img_height / $('.img_area').find('img').data('height')
+            masks.push({
+                left: (m_l - img_left) / w_value,
+                top: (m_t - img_top) / h_value,
+                width: m_w / w_value,
+                height: m_h / h_value
+            })
+            draw_canvas_mask(m_l / w_value, m_t / h_value, m_w / w_value, m_h / h_value)
+        }
+        var imgdata = canvas.toDataURL("image/png");
+        var blob = dataURItoBlob(imgdata);
+        var formData = new FormData();
+        formData.append("src", src);
+        formData.append("masks", JSON.stringify(masks));
+        formData.append("image", blob);
+        $.ajax({
+        url: 'http://localhost:3000/body?act=mask',
+        method: 'post',
+        data: {
+            src: src
+        },
+        data: formData,
+            async: false,
+            processData: false, // 告诉jQuery不要去处理发送的数据
+            contentType: false, // 
+        success: function(jsonObj) {
+            if (jsonObj.ret == 0) {
+                ctx.clearRect(0, 0, $('.img_area').width(), $('.img_area').height())
+                    send_face_info();
+                    clear();
+            } else {
+                alert(jsonObj.msg)
+            }
+        }
+        })
+    }
+    img.src = src
+}
+function dataURItoBlob(base64Data) {
+    var byteString;
+    if (base64Data.split(',')[0].indexOf('base64') >= 0)
+        byteString = atob(base64Data.split(',')[1]);
+    else
+        byteString = unescape(base64Data.split(',')[1]);
+    var mimeString = base64Data.split(',')[0].split(':')[1].split(';')[0];
+    var ia = new Uint8Array(byteString.length);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ia], {
+        type: mimeString
+    });
+}
+
+function send_face_info() {
+    var rectInfos = renew_face_info().rects;
+    var src = $('.img_area').find('img').attr('src');
+    $.ajax({
+        url: 'http://localhost:3000/body?act=store_face_info',
+        method: 'post',
+        data: {
+            src: src,
+            rects: JSON.stringify(rectInfos)
+        },
+        async: false,
+        success: function(jsonObj) {
+            if (jsonObj.ret == 0) {
+                nextImg()
+            } else {
+                alert(jsonObj.msg)
+            }
+        }
+    })
+}
+//恢复数据到图片原始大小
+function renew_face_info() {
+    var newRects = [],
+        newPoints = [];
+    //人脸框数据
+    for (var i = 0; i < rects.length; i++) {
+        if (!rects[i].px) {
+            rects[i].px = 1;
+        }
+        if (!rects[i].py) {
+            rects[i].py = 1;
+        }
+        var px = rects[i].px;
+        var r_left = rects[i].left / px;
+        var py = rects[i].py;
+        var r_top = rects[i].top / py;
+        //图片存储大小
+        var w = rects[i].width / px;
+        var h = rects[i].height / py;
+
+        newRects.push({
+            left: r_left,
+            top: r_top,
+            width: w,
+            height: h,
+            rect: rects[i].rect,
+            posture: rects[i].posture,
+            shadow: rects[i].shadow,
+            definition: rects[i].definition
+        })
+    }
+    return {
+        rects: newRects,
+    }
+}
+//删除存储的人脸框信息
+function del_from_rects(r_class) {
+    var newRects = [];
+    for (var i = 0; i < rects.length; i++) {
+        var rect = rects[i].rect;
+        if (r_class != rect) {
+            newRects.push(rects[i])
+        }
+    }
+    rects = newRects;
+}
+//清除上一次图片信息
+function clear() {
+    $('.img_area').find('.rect').remove();
+    $('.img_area').find('.border').remove();
+    $('.img_area').find('img').css({
+        width: 'auto',
+        height: 'auto',
+    });
+    $('.img_area').find('img').css('left', '0px');
+    $('.img_area').find('img').css('top', '0px');
+    $('.img_area').find('canvas').css('left', '0px');
+    $('.img_area').find('canvas').css('top', '0px');
+    //人形标签选择清空
+    $("input[name='posture']").attr("checked", false);
+    $("input[name='shadow']").attr("checked", false);
+    $("input[name='definition']").attr("checked", false);
+
+    r_num = 0;
+    hasDrag = false;
+    hasMove = false;
+    rects = [];
+}
+</script>
+
+</html>
