@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>人脸标注</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="/lib/bootstrap-3.3.5/bootstrap.min.css">
+    <style type="text/css">
+    html,body,.wrapper{
+        height: 100%;
+    }
+        .wrapper {
+            width: 1100px;
+            height: 600px;
+            margin: auto;
+        }
+        
+        .wrapper .left,
+        .wrapper .right {
+            float: left;
+        }
+        
+        .wrapper ul {
+            padding: 0px;
+            margin: 0px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #dcdcdc;
+        }
+        
+        .wrapper ul li {
+            list-style: none;
+            float: left;
+            height: 40px;
+            line-height: 40px;
+            border: 1px solid #dcdcdc;
+            border-bottom: none;
+            padding: 0px 15px;
+        }
+        
+        .wrapper ul li.active {
+            border: 1px solid red;
+            color: red;
+        }
+        
+        .step {
+            text-align: center;
+        }
+        
+        .wrapper .operate {
+            margin-bottom: 5px;
+            position: relative;
+            position: relative;
+        }
+        
+        input[type='file'] {
+            left: 0px;
+            position: absolute;
+            width: 95px;
+            opacity: 0;
+            top:0px;
+        }
+        .wrapper .wrap{
+            width: 852px;
+            border: 1px solid #dcdcdc;
+            height: 606px;
+            float: left;
+            overflow: hidden;
+            position: relative;
+        }
+        .wrapper .display {
+            width: 750px;
+            height: 606px;
+            float: left;
+            overflow: hidden;
+            padding: 15px;
+        }
+        .wrapper .img_area {
+            width: 720px;
+            height: 576px;
+            float: left;
+            overflow: hidden;
+            position: relative;
+        }
+        .rect_wrap.selected .l_b,.rect_wrap.selected .t_b,.rect_wrap.selected .r_b,.rect_wrap.selected .b_b{
+           background: red;
+        }
+        .wrapper .img_area img {
+            z-index: 0;
+            left: 
+        }
+        .wrapper .img_area .rect_wrap .rect{
+            position: absolute;
+            z-index: 1;
+        }
+        .l_b,.t_b,.r_b,.b_b{
+            position: absolute;
+            z-index: 100;
+            background: #f77070;
+        }
+       .rect_wrap.selected .l_b.blue,.rect_wrap.selected .t_b.blue,.rect_wrap.selected .r_b.blue,.rect_wrap.selected .b_b.blue{
+            background: blue;
+        }
+        .wrapper .img_area .choosed {
+            border: 5px solid red;
+        }
+        
+        .wrapper .img_area .masking {
+            background: rgba( 89, 89, 89, 0.97);
+        }
+        
+        .wrapper .img_area .close {
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            text-align: center;
+            line-height: 20px;
+        }
+        
+        .wrapper .img_area .point {
+            position: absolute;
+            background: red;
+            width: 10px;
+            height: 10px;
+            border-radius: 100%;
+            z-index: 150;
+        }
+           .wrapper .wrap .pre{
+        	
+            width: 50px;
+            height: 606px;
+        	background: rgba(0,0,0,0.1);
+        	padding: 226px 0;
+        	color: #fff; 
+        	text-align: center;
+        	float: left;
+        	display: block;
+        	font-size: 32px;
+        }
+        .wrapper .wrap .next{
+            width: 50px;
+            height: 606px;
+        	background: rgba(0,0,0,0.1);
+        	   padding: 226px 0;
+        	color: #fff;
+        	text-align: center;
+        	float: left;
+        	display: block;
+        	font-size: 32px;
+        }
+        .right{
+            width: 240px;
+            height: 637px;
+            border: 1px solid #dcdcdc;
+             padding: 0 15px;
+        }
+        .right .filename{
+            margin-top: 30px;
+            height: 40%;
+            word-wrap: break-word;
+            width: 210px;
+            overflow-y: hidden;
+        }
+
+        .wrapper .choose_area {
+           height: 50%;
+
+        }
+        .classify{
+            height: 40px;
+            line-height: 40px;
+            padding: 15px;
+        }
+        .list{
+            width: 204px;
+            border: 1px solid #dcdcdc;
+            position: absolute;
+            z-index: 100;
+            background: #fff;
+        }
+        .list li{
+            width: 100%;
+            height: 30px;
+            border:none;
+            border-bottom: 1px dashed #dcdcdc;
+            line-height: 30px;
+        }
+        .directory{
+            position: absolute;
+            width: 200px;
+            left: 250px;
+            background: #fff;
+            z-index: 1000;
+            display: none;
+            max-height: 300px;
+            overflow: auto;
+        }
+        .directory li{
+            width: 100%;
+            padding: 0 15px;
+         
+        }
+        .dialog{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            top:0px;
+            left: 0px;
+        }
+        .storeType,.delModal{
+            position: absolute;
+            width: 400px;
+            height: 130px;
+            background: #fff;
+            z-index: 1000;
+            left: 50%;
+            top: 50%;
+            border: 1px solid #dcdcdc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-left: -200px;
+            margin-top: -65px;
+        }
+        .delModal{
+            display: none;
+        }
+        .storeType .footer{
+            text-align: center;
+            border-top: 1px solid #dcdcdc;
+            margin-top: 20px;
+            height: 30px;
+            line-height: 30px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+<!--     <ul>
+        <li class="face">人脸检测</li>
+        <li class="object active">物体标注</li>
+        <div style="clear:both;"></div>
+    </ul> -->
+    <div class="left">
+        <div class="operate">
+            <button class="choose_load">选择加载图片</button>
+            <input type="file" />
+            <button class="mask">蒙版</button>
+             <button class="del">删除标注框</button>
+         <!--    <button class="insulate">隔离</button> -->
+            <button class="save">保存</button>
+            <button class="save_as">另存为</button>
+            <ul class="directory">
+               
+            </ul>
+               <button class="del_img">删除图片</button>
+           
+           <!--  <button class="compare">比对</button> -->
+        </div>
+        <div class="wrap">
+            <div class="pre"><span><</span></div>
+            <div class="display">
+                <div class="img_area">
+                    <img class="img" src="" onload="loadImage(this)">
+                </div>
+            </div>
+            <div class="next"><span>></span></div>
+        </div>
+      
+    </div>
+    <div class="right">
+        <div class="filename" title=""></div>
+        <fieldset class="choose_area" >
+           <input type="text" class="classify" name="classify" text="请输入类别">
+           <ul class="list"></ul>
+           <br>
+           <input type="checkbox" name="difficult" class="difficult" style="margin-top:100px;">困难
+        </fieldset>
+    </div>
+    </div>
+        <div class="dialog">
+        <div class="storeType">
+        <div style="border-bottom:1px solid #dcdcdc;">请选择数据存储模式</div>
+        <div style="margin-top:15px;">
+            <input type="radio" value="1" name="type">ALT格式
+            <input type="radio" value="2" name="type" checked="checked" style="margin-left:100px;">pascal格式
+        </div>
+
+        <div class="footer">确定</div>
+         </div>
+        </div>
+        <div class="delModal">
+            <div class="modal-body">
+                确认删除该图片？
+            </div>
+            <div class="modal-footer">
+                <button class="yes">确定</button>
+                <button class="no">取消</button>
+            </div>
+        </div>
+    <script src="/lib/jquery-1.11.3.min.js"></script>
+    <script src="/lib/jquery.mousewheel.min.js"></script>
+    <script src="/javascripts/object.js"></script>
+    <script>
+    //人形、人脸标注工具切换
+    $('.wrapper li').on('click', function() {
+        $('.wrapper li').removeClass('active');
+        $(this).addClass('active');
+        if ($('.object').hasClass('active')) {
+            location.href = 'http://localhost:3000'
+        } else {
+            location.href = 'http://localhost:3000/object'
+        }
+    })
+    </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<annotation>
+  <filename>u=496108860,2411354324&amp;fm=23&amp;gp=0.jpg</filename>
+  <size>
+    <width>491</width>
+    <height>300</height>
+  </size>
+  <object>
+    <name>person</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>139</xmin>
+      <ymin>123</ymin>
+      <xmax>386</xmax>
+      <ymax>283</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>person</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>147</xmin>
+      <ymin>32</ymin>
+      <xmax>278</xmax>
+      <ymax>94</ymax>
+    </bndbox>
+  </object>
+</annotation>

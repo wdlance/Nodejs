@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<annotation>
+  <filename>下载_mask.jpg</filename>
+  <size>
+    <width>399</width>
+    <height>300</height>
+  </size>
+  <object>
+    <name>mask</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>236</xmin>
+      <ymin>56</ymin>
+      <xmax>336</xmax>
+      <ymax>219</ymax>
+    </bndbox>
+  </object>
+</annotation>

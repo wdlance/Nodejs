@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<annotation>
+  <filename>vtnhywQS96A+19+0+26000.jpg</filename>
+  <size>
+    <width>480</width>
+    <height>360</height>
+  </size>
+  <object>
+    <name>dog</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>107</xmin>
+      <ymin>212</ymin>
+      <xmax>327</xmax>
+      <ymax>360</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>dog</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>353</xmin>
+      <ymin>186</ymin>
+      <xmax>481</xmax>
+      <ymax>362</ymax>
+    </bndbox>
+  </object>
+</annotation>

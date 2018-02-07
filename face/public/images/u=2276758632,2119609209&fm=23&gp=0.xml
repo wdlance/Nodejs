@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<annotation>
+  <filename>u=2276758632,2119609209&amp;fm=23&amp;gp=0.jpg</filename>
+  <size>
+    <width>199</width>
+    <height>300</height>
+  </size>
+  <object>
+    <name>person</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>0</xmin>
+      <ymin>0</ymin>
+      <xmax>199</xmax>
+      <ymax>300</ymax>
+    </bndbox>
+  </object>
+</annotation>

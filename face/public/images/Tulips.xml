@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<annotation>
+  <filename>Tulips.jpg</filename>
+  <size>
+    <width>1024</width>
+    <height>768</height>
+  </size>
+  <object>
+    <name>car</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>288</xmin>
+      <ymin>0</ymin>
+      <xmax>1024</xmax>
+      <ymax>387</ymax>
+    </bndbox>
+  </object>
+</annotation>

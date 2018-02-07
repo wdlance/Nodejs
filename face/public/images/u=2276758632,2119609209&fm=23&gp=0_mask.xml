@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<annotation>
+  <filename>u=2276758632,2119609209&amp;fm=23&amp;gp=0_mask.jpg</filename>
+  <size>
+    <width>199</width>
+    <height>300</height>
+  </size>
+  <object>
+    <name>mask</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>98</xmin>
+      <ymin>30</ymin>
+      <xmax>165</xmax>
+      <ymax>76</ymax>
+    </bndbox>
+  </object>
+</annotation>

@@ -5,9 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var ejs = require('ejs');
-var index = require('./routes/index');
+var face = require('./routes/face');
 var body = require('./routes/body');
-
+var object = require('./routes/object');
 var app = express();
 
 // view engine setup
@@ -28,8 +28,8 @@ app.all('*', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "http://localhost");
     next();
 });
-app.use('/', index);
-app.use('/body', body);
+app.use('/', object);
+app.use('/object', object);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
