@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<annotation>
+  <filename>Penguins.jpg</filename>
+  <size>
+    <width>1024</width>
+    <height>768</height>
+  </size>
+  <object>
+    <name>person</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>110</xmin>
+      <ymin>0</ymin>
+      <xmax>487</xmax>
+      <ymax>768</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>cat</name>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>598</xmin>
+      <ymin>38</ymin>
+      <xmax>912</xmax>
+      <ymax>702</ymax>
+    </bndbox>
+  </object>
+</annotation>

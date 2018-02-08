@@ -210,11 +210,11 @@
             <!--  <button class="order_load">顺序加载图片</button> -->
             <button class="choose_load">选择加载图片</button>
             <input type="file" />
-            <button class="mask">蒙版</button>
-            <button class="insulate">隔离</button>
+         <!--    <button class="mask">蒙版</button>
+            <button class="insulate">隔离</button> -->
             <button class="save">保存</button>
             <button class="del_rect">删除人脸框</button>
-            <button class="compare">比对</button>
+        
         </div>
         <h3 class="step">
     步骤一：选择图片
@@ -311,7 +311,7 @@ var points = [];
 var labels = [];
 var images=[];//用户选择图片后面的所有图片数组
 $('input[type="file"]').on('change', function(e) {
-     var filename = e.target.files[0].name;
+    var filename = e.target.files[0].name;
     img_num = getIndex(filename);//每次重新加载图片时，都是返回图片数组中的第一张图片
     for (var i = 0; i < allImages.length; i++) {
         if (allImages[i].split('/')[allImages[i].split('/').length - 1] == filename) {

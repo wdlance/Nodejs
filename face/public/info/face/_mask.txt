@@ -1,1 +1,1 @@
-[{"src":"images/u=3631299066,1177352613&fm=23&gp=0.jpg","masks":[{"left":34.89583492279053,"top":95.29515075683594,"width":41.11112,"height":129.11112}]}]
+[{"src":"images/u=3631299066,1177352613&fm=23&gp=0.jpg","masks":[{"left":34.890625,"top":95.28125,"width":41,"height":129}]},{"src":"images/u=2276758632,2119609209&fm=23&gp=0.jpg","masks":[]},{"src":"images/u=496108860,2411354324&fm=23&gp=0.jpg","masks":[]},{"src":"images/2/234.jpg","masks":[]}]

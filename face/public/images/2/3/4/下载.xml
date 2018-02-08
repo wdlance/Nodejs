@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<annotation>
+  <filename>下载.jpg</filename>
+  <size>
+    <width>399</width>
+    <height>300</height>
+  </size>
+  <object>
+    <name>person</name>
+    <difficult>1</difficult>
+    <bndbox>
+      <xmin>97</xmin>
+      <ymin>93</ymin>
+      <xmax>295</xmax>
+      <ymax>209</ymax>
+    </bndbox>
+  </object>
+</annotation>
