@@ -475,10 +475,6 @@ $('.display').on('mousedown', function(e) {
      //获取滚动
     var scrollX=window.scrollX;
     var scrollY=window.scrollY;
-    var width0 = $(this).data('width'); //获取图片原始宽度
-    var height0 = $(this).data('height'); //获取图片原始高度
-    var width = $(this).width(); //获取图片当前宽度
-    var height = $(this).height(); //获取图片当前高度
     //获取鼠标点击位置
     var x = e.clientX+scrollX;
     var y = e.clientY+scrollY;
